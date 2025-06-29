@@ -1,8 +1,8 @@
 from storage import read_tasks, write_tasks
 
 TASKS_FILE_PATH= "tasks.json"
-
 tasks = read_tasks(TASKS_FILE_PATH)
+
 def show_menu():
     print(".....To_Do_List....")
     print("'1'. Add Task")
@@ -14,12 +14,22 @@ def show_menu():
     
 def add_task():
     task = input("Enter a task to be done: ")
+    due_date = input("Enter due date (YYYY-MM-DD): ").strip()
+    priority = input("Enter priority (High, Medium, Low): ")
  
     if any(t['task'] == task for t in tasks):
         print(f"You have already added {task} to the list")
-    else:
-        tasks.append({'task':task, 'done':False})
-        print(f"Task {task} added.")
+        return
+        
+    task = {
+        'task': task,
+        'done': False,
+        'due_date': due_date,
+        'priority': priority
+    }
+    tasks.append(task)
+    write_tasks(TASKS_FILE_PATH, tasks)
+    print(f"Task {task} added.")
     
 def view_task():
     if not tasks:
@@ -28,7 +38,7 @@ def view_task():
     print("Your Tasks...")
     for index, task in enumerate(tasks, start=1):
         status = 'completed' if task['done'] else "not completed"
-        print(f"{index}: {task['task']} [{status}]")
+        print(f"{index}. {task['task']} [{status}] - Due: {task['due_date']} | Priority: {task['priority']}")
 
 def mark_task():
     view_task()
@@ -39,19 +49,20 @@ def mark_task():
         if 0 <= index < len(tasks):
             tasks[index]['done'] = not tasks[index]['done']
             status = 'done' if tasks[index]['done'] else 'not done'
+            write_tasks(TASKS_FILE_PATH, tasks)
             print(f"Marked as {status}.")
-            # tasks[index]['done'] = True
-            # print("Marked as done.")
         else:
             print("Invalid input!")
     except ValueError:
         print("Please enter a valid number.")
-def number_of_completed_task():
-    view_task()
-    if not tasks:
+def view_completed_task():
+    completed = [t for t in tasks if t['done']]
+    if not completed:
+        print(f"You haven't completed any tasks yet.")
         return
-    tasks_done = len([t for t in tasks if t['done']])
-    print(f"You have completed {tasks_done} tasks")
+    print("\n Completed Tasks: ")
+    for index, task in enumerate(completed, 1):
+        print(f"{index}. {task['task']} - Due: {task['due_date']} | priority: {task['priority']}")
     
 def delete_task():
     view_task()
@@ -61,6 +72,7 @@ def delete_task():
         index = int(input("Enter a number of a task to delete: "))-1
         if 0 <= index < len(tasks):
             removed = tasks.pop(index)
+            write_tasks(TASKS_FILE_PATH, tasks)
             print(f"Deleted task: {removed['task']}")
         else:
             print("Invalid input.")
@@ -70,7 +82,7 @@ def delete_task():
 def main():
     while True:
         show_menu()
-        choice = input("Enter an option(1-5): ").strip()
+        choice = input("Enter an option(1-6): ").strip()
             
         if choice == '1':
             add_task()
@@ -79,7 +91,7 @@ def main():
         elif choice == '3':
             mark_task()
         elif choice == '4':
-            number_of_completed_task()
+            view_completed_task()
         elif choice == '5':
             delete_task()
         elif choice == '6':
