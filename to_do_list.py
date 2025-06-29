@@ -1,12 +1,14 @@
+from storage import read_tasks, write_tasks
 
-tasks = []
+TASKS_FILE_PATH= "tasks.json"
 
+tasks = read_tasks(TASKS_FILE_PATH)
 def show_menu():
     print(".....To_Do_List....")
     print("'1'. Add Task")
     print("'2'. View Task")
     print("'3'. Mark Task as Done")
-    print("'4' Completed tasks")
+    print("'4'. Completed tasks")
     print("'5'. Delete Task")
     print("'6'. Exit")
     
@@ -64,23 +66,27 @@ def delete_task():
             print("Invalid input.")
     except ValueError:
         print("Please enter a valid number.")
-    
-while True:
-    show_menu()
-    choice = input("Enter an option(1-5): ")
+
+def main():
+    while True:
+        show_menu()
+        choice = input("Enter an option(1-5): ").strip()
+            
+        if choice == '1':
+            add_task()
+        elif choice == '2':
+            view_task()
+        elif choice == '3':
+            mark_task()
+        elif choice == '4':
+            number_of_completed_task()
+        elif choice == '5':
+            delete_task()
+        elif choice == '6':
+            print("Goodbye!")
+            break
+        else:
+            print("Invalid choice! Try again.")
         
-    if choice == '1':
-        add_task()
-    elif choice == '2':
-        view_task()
-    elif choice == '3':
-        mark_task()
-    elif choice == '4':
-        number_of_completed_task()
-    elif choice == '5':
-        delete_task()
-    elif choice == '6':
-        print("Goodbye!")
-        break
-    else:
-        print("Invalid choice! Try again.")
+if __name__ == "__main__":
+    main()
